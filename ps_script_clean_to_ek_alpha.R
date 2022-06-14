@@ -1,11 +1,12 @@
-#multiple dataset from data removing empty rETR lines and renaming working dataset to ae
-#can be used for other algae with simple treatments
-
+#This script takes the cleaned data from PAM output and runs the Phytotools package to
+#produce a final dataset that can be used for analysis.
+#take cleaned data from Python script and run through phytotools package to get ek and alpha etc
+#open appropriate libraries
 library("phytotools")
 library("hash")
 library("dplyr")
 
-alpha_ek_alga <- read.csv("/Users/Angela/src/work/limu/algal_growth_photosynthesis/data_output/run5-6_clean.csv", sep = ",")
+alpha_ek_alga <- read.csv("data_input/run5-6_clean.csv", sep = ",")
 
 # add a column that turns date format into POSIXct
 alpha_ek_alga$posix_date <- as.POSIXct(alpha_ek_alga$Date, format = "%m/%d/%y")
@@ -25,8 +26,11 @@ alpha_ek_alga$treatment <- as.factor(substr(alpha_ek_alga$ID2, 5, 5))
 # create a new column based on Y(II) at Epar 0 (Effective quantum yield)
 alpha_ek_alga <- transform(alpha_ek_alga, QuanYield = ifelse(Epar == "0", Y.II., NA))  
 
+# remove all rows where rETR is null or negative
+selectedData <- subset(alpha_ek_alga, rETR > 0) 
+selectedData <- alpha_ek_alga
 # unique function eliminates duplicates returns all unique IDs into a vector
-uniqueIds <- unique(alpha_ek_alga$uid)
+uniqueIds <- unique(selectedData$uid)
 
 # store the number of unique IDs in the variable n
 n <- length(uniqueIds)
@@ -37,79 +41,63 @@ rETRMaxes = array(NA,c(n,1))
 
 # create the rETRmax column
 for (i in 1:n){
-  sub <- subset(alpha_ek_alga, uid == uniqueIds[i])
-  subMaxETR <- max(sub$rETR)
-  #store the subMaxETR in the new column but only in rows where uid is same as uniqueIds of i
-  alpha_ek_alga$rETRmax[alpha_ek_alga$uid == uniqueIds[i]] <- subMaxETR
-  #also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax
-  rETRMaxes[i] = subMaxETR
-  }
+        sub <- subset(selectedData, uid == uniqueIds[i])
+        subMaxETR <- max(sub$rETR)
+        #store the subMaxETR in the new column but only in rows where uid is same as uniqueIds of i
+        selectedData$rETRmax[selectedData$uid == uniqueIds[i]] <- subMaxETR
+        #also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax
+        rETRMaxes[i] = subMaxETR
+        #temperatures[i] = max(sub$Temp)
+}
 
 # prepare empty matrices to hold output from fitWebb
 alpha <- array(NA,c(n,4))
 ek <- array(NA,c(n,4))
 
-#create a treatment vector from alpha_ek_alga treatment column
-treatment_names = c("35‰/0.5μM", "35‰/14μM", "28‰/27μM", "18‰/53μM", "11‰/80μM","28‰/53μM")
+#create a treatmemt vector from SelecteData treatment column
+treatment_names = c("35ppt/0.5uM", "35ppt/14uM", "28ppt/27uM", "18ppt/53uM", "11ppt/80uM", "28ppt/53uM")
 treatment = array(NA,c(n,1))
 
-# Use this to switch from one plot with all the curves overlaid together 
-#to one individual plot for each specimen
-individual_plots = TRUE
-
-if (!individual_plots)plot
-plot(NA,NA, main = "rETR", 
-     xlab = "Epar (μmols photons m-2 s-1)", 
-     ylab = "rETR (μmols electrons m-2 s-1)", 
-     xlim = c(0,1000), 
-     ylim = c(0,400))
-
 for (i in 1:n){
-  #Get ith data
-  Epar <- alpha_ek_alga$Epar[alpha_ek_alga$uid==uniqueIds[i]]
-  rETR <- alpha_ek_alga$rETR[alpha_ek_alga$uid==uniqueIds[i]]
- 
-  #Call function
-  myfit <- fitWebb(Epar,rETR)
-  #Store the 4-values outputs into the matrix 
-  alpha[i,] <- myfit$alpha
-  ek[i,] <- myfit$ek 
-
-# plot the data points
-#if (individual_plots)
-#  plot(Epar,rETR, main = uniqueIds[i], xlab = "Epar (μmols photons m-2 s-1)", 
-#       ylab = "rETR (μmols electrons m-2 s-1)", xlim = c(0,1000), ylim = c(0,500))
-
-E <- seq(0,1000,by=1)
-with(myfit, {
-  P <- alpha[1] * ek[1] * (1 - exp (-E / ek[1]))
-#  lines(E, P)
-})
+        #Get ith data
+        Epar <- selectedData$Epar[selectedData$uid==uniqueIds[i]]
+        rETR <- selectedData$rETR[selectedData$uid==uniqueIds[i]]
+        
+        #Call function
+        myfit <- fitWebb(Epar, rETR)
+        #store the four values outputs in the matrix
+        alpha[i,] <- myfit$alpha
+        ek[i,] <- myfit$ek
 }
 
-#create a vector for ETRmax and calculate from rETRmax
+#extracting the date and the specimen ID from the uniqueIds
+dates = substr(uniqueIds, 1, 10)
+specimens = substr(uniqueIds, 12, 17)
+
+#create a vector for ETRmax calculated from rETRmax for Dr Smith to visualize
 ETRmax = round(rETRMaxes*0.5*0.84, digits = 2)
 
-#add a new column to alpha_ek_alga for ETRmax for Dr. Smith to visualize
-alpha_ek_alga$ETRmax <- round(alpha_ek_alga$rETRmax*0.5*0.84, digits = 2)
+#add a new column to selectedData for ETRmax
+selectedData$ETRmax <- round(selectedData$rETRmax*0.5*0.84, digits = 2)
 
-# extracting the date and the specimen ID from the uniqueIds
-dates = substr(uniqueIds, 1, 10)
+rlc_day_assign <- read.csv("/Users/Angela/src/work/limu/phytotools_alpha_ek/data_input/date_day_assignment.csv")
 
-# read in dataframe with date and RLC day for integration with the ek alpha output
-rlc_day_assign <- read.csv("/Users/Angela/src/work/limu/phytotools_alpha_ek/data_input/date_day_assignment.csv", sep = ",")
-
-# create an array that combines the date with the RLC day (1, 5, or 9)
 rlc_days_by_date = array(dim = length(dates))
 hash_of_rlc_days_by_date <- hash(rlc_day_assign$Date, rlc_day_assign$RLC.Day)
-for (i in 1:length(dates)) {
-  rlc_days_by_date[i] = hash_of_rlc_days_by_date[[dates[i]]]
+for (i in 1: length(dates)) {
+        rlc_days_by_date[i] = hash_of_rlc_days_by_date[[dates[i]]]
 }
 
-
+lanai_side_by_date = array(dim = length(dates))
+hash_of_lanai_side_by_date <- hash(rlc_day_assign$Date, tolower(rlc_day_assign$Lanai.side))
+for (i in 1:length(dates)) {
+        lanai_side_by_date[i] = as.character(hash_of_lanai_side_by_date[[dates[i]]])
+}
 
 first_row_of_rlc <- subset(alpha_ek_alga, Epar == 0 & NPQ == "-")
 last_row_rlc <- subset(alpha_ek_alga, Epar == 820)
+ 
+
 
 # build the result data frame
 result_df <- data.frame(Date = substr(uniqueIds, 1, 10), 
@@ -137,6 +125,8 @@ result_df <- data.frame(Date = substr(uniqueIds, 1, 10),
 # save to file
 write.csv(result_df, "data_output/run5-6_ek_alpha.csv")
 
+
+#UNUSED code below
 #PLOTS
 # Uncomment these to use quartz, if needed
 # quartz(width = 24, height = 12)
@@ -147,3 +137,7 @@ write.csv(result_df, "data_output/run5-6_ek_alpha.csv")
 #for (i in 1:length(dates)) {
 #  lanai_side_by_date[i] = as.character(hash_of_lanai_side_by_date[[dates[i]]])
 #}
+
+#create a treatment vector from alpha_ek_alga treatment column
+#treatment_names = c("35‰/0.5μM", "35‰/14μM", "28‰/27μM", "18‰/53μM", "11‰/80μM","28‰/53μM")
+#treatment = array(NA,c(n,1))

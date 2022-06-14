@@ -1,6 +1,4 @@
-#multiple dataset from data removing empty rETR lines and renaming working dataset to ae
-#can be used for other algae with simple treatments
-
+#take cleaned data from Python script and run through phytotools package to get ek and alpha etc
 library("phytotools", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 
 alpha_ek_alga <- read.csv("/Users/Angela/Library/Mobile Documents/com~apple~CloudDocs/research_plakobranchus/plako_paper/crj/plako_data_122021_for_final_revised/plako_cleaned.csv", sep = ";")
