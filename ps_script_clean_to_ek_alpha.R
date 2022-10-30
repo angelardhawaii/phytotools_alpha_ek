@@ -6,7 +6,7 @@ library("phytotools")
 library("hash")
 library("dplyr")
 
-alpha_ek_alga <- read.csv("data_input/run5-6_clean.csv", sep = ",")
+alpha_ek_alga <- read.csv("data_input/hyp_ulva_all_runs_clean.csv", sep = ",")
 
 # add a column that turns date format into POSIXct
 alpha_ek_alga$posix_date <- as.POSIXct(alpha_ek_alga$Date, format = "%m/%d/%y")
@@ -18,7 +18,7 @@ alpha_ek_alga$uid <- paste(alpha_ek_alga$posix_date, alpha_ek_alga$ID, sep = "_"
 alpha_ek_alga$species <- as.factor(tolower(substr(alpha_ek_alga$ID2, 1, 2)))
 
 #add a new column for treatment assigned from the 5th character in ID2
-alpha_ek_alga$treatment <- as.factor(substr(alpha_ek_alga$ID2, 5, 5))
+alpha_ek_alga$treatment <- as.factor(substr(alpha_ek_alga$ID2, 5, 7))
 
 # add a new column for the effective quantum yield
 #alpha_ek_alga$QuanYield <- as.factor(round((alpha_ek_alga$Fm. - alpha_ek_alga$F) / alpha_ek_alga$Fm., digits = 3))
@@ -55,16 +55,17 @@ alpha <- array(NA,c(n,4))
 ek <- array(NA,c(n,4))
 
 #create a treatmemt vector from SelecteData treatment column
-treatment_names = c("35ppt/0.5uM", "35ppt/14uM", "28ppt/27uM", "18ppt/53uM", "11ppt/80uM", "28ppt/53uM")
+treatment_names = c("35ppt/0.5uM", "35ppt/14uM", "28ppt/27uM", "28ppt/53uM", "18ppt/53uM", "11ppt/80uM")
 treatment = array(NA,c(n,1))
 
 for (i in 1:n){
         #Get ith data
         Epar <- selectedData$Epar[selectedData$uid==uniqueIds[i]]
         rETR <- selectedData$rETR[selectedData$uid==uniqueIds[i]]
+        y.II <- selectedData$Y.II.[selectedData$uid==uniqueIds[i]]
         
-        #Call function
-        myfit <- fitWebb(Epar, rETR)
+        #Call function (adding normalize = TRUE will yield more accurate PE parameters)
+        myfit <- fitWebb(Epar, y.II, normalize = TRUE)
         #store the four values outputs in the matrix
         alpha[i,] <- myfit$alpha
         ek[i,] <- myfit$ek
@@ -72,7 +73,7 @@ for (i in 1:n){
 
 #extracting the date and the specimen ID from the uniqueIds
 dates = substr(uniqueIds, 1, 10)
-specimens = substr(uniqueIds, 12, 17)
+specimens = substr(uniqueIds, 12, 18)
 
 #create a vector for ETRmax calculated from rETRmax for Dr Smith to visualize
 ETRmax = round(rETRMaxes*0.5*0.84, digits = 2)
@@ -101,7 +102,7 @@ last_row_rlc <- subset(alpha_ek_alga, Epar == 820)
 
 # build the result data frame
 result_df <- data.frame(Date = substr(uniqueIds, 1, 10), 
-                        "Specimen ID" = substr(uniqueIds, 12, 17),
+                        "Specimen ID" = substr(uniqueIds, 12, 18),
                         uid = uniqueIds, 
                         "Plant ID" = first_row_of_rlc$plant.ID,
                         "Species" = first_row_of_rlc$species,
@@ -123,21 +124,4 @@ result_df <- data.frame(Date = substr(uniqueIds, 1, 10),
 #"alpha_est", "alpha_stderr", "alpha_t", "alpha_p", "ek_est", "ek_stderr", "ek_t", "ek_p", 
 
 # save to file
-write.csv(result_df, "data_output/run5-6_ek_alpha.csv")
-
-
-#UNUSED code below
-#PLOTS
-# Uncomment these to use quartz, if needed
-# quartz(width = 24, height = 12)
-# par(mfrow = c(7, 9),  lwd = 1.3)
-
-#lanai_side_by_date = array(dim = length(dates))
-#hash_of_lanai_side_by_date <- hash(rlc_day_assign$Date, tolower(rlc_day_assign$Lanai.side))
-#for (i in 1:length(dates)) {
-#  lanai_side_by_date[i] = as.character(hash_of_lanai_side_by_date[[dates[i]]])
-#}
-
-#create a treatment vector from alpha_ek_alga treatment column
-#treatment_names = c("35‰/0.5μM", "35‰/14μM", "28‰/27μM", "18‰/53μM", "11‰/80μM","28‰/53μM")
-#treatment = array(NA,c(n,1))
+write.csv(result_df, "data_output/hyp_ulva_all_runs_ek_alpha_normalized.csv")

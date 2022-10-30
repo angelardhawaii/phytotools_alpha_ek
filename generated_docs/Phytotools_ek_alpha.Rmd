@@ -1,0 +1,179 @@
+---
+title: "Using Cleaned Photosynthesis Dataset to Produce Final with Ek and alpha"
+author: "Angela Richards Donà"
+date: "5/19/2022"
+output:
+  html_document:
+    df_print: paged
+---
+Produce final dataset using cleaned PAM data and Phytotools package
+This script takes the cleaned data from PAM output and runs the Phytotools package to
+produce a final dataset that can be used for analysis.
+
+```{r}
+library("phytotools")
+library("hash")
+library("dplyr")
+```
+## Read in the data
+```{r}
+alpha_ek_alga <- read.csv("/Users/Angela/src/work/limu/algal_growth_photosynthesis/data_output/run5-6_clean.csv", sep = ",")
+```
+
+## Add a column that turns date format into POSIXct
+```{r}
+alpha_ek_alga$posix_date <- as.POSIXct(alpha_ek_alga$Date, format = "%m/%d/%y")
+```
+
+## Add a new column with date and specimen ID as unique key
+```{r}
+alpha_ek_alga$uid <- paste(alpha_ek_alga$posix_date, alpha_ek_alga$ID, sep = "_")
+```
+
+## Add a new column with a number to indicate just the species
+```{r}
+alpha_ek_alga$species <- as.factor(tolower(substr(alpha_ek_alga$ID2, 1, 2)))
+```
+
+## Add a new column for treatment assigned from the 5th character in ID2
+```{r}
+alpha_ek_alga$treatment <- as.factor(substr(alpha_ek_alga$ID2, 5, 5))
+```
+
+## Create a new column based on Y(II) at Epar 0 (Effective quantum yield)
+```{r}
+alpha_ek_alga <- transform(alpha_ek_alga, QuanYield = ifelse(Epar == "0", Y.II., NA))  
+```
+
+## Use unique function to eliminate duplicates and return all unique Date/IDs into a vector
+```{r}
+uniqueIds <- unique(alpha_ek_alga$uid)
+```
+
+## Store the number of unique IDs in the variable n
+```{r}
+n <- length(uniqueIds)
+```
+
+## Create a matrix full of NAs with n rows and 1 column to later calculate ETRmax 
+```{r}
+rETRMaxes = array(NA,c(n,1))
+```
+
+## Create the rETRmax column
+```{r}
+for (i in 1:n){
+  sub <- subset(alpha_ek_alga, uid == uniqueIds[i])
+  subMaxETR <- max(sub$rETR)
+  #store the subMaxETR in the new column but only in rows where uid is same as uniqueIds of i
+  alpha_ek_alga$rETRmax[alpha_ek_alga$uid == uniqueIds[i]] <- subMaxETR
+  #also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax
+  rETRMaxes[i] = subMaxETR
+  }
+```
+
+## Prepare empty matrices to hold output from fitWebb
+```{r}
+alpha <- array(NA,c(n,4))
+ek <- array(NA,c(n,4))
+```
+
+## Use this to switch from one plot with all the curves overlaid together to one
+##individual plot for each specimen
+```{r}
+individual_plots = FALSE
+```
+
+## Plots are too many to run for markdown and will be commented out but the code is here
+
+if (!individual_plots)plot
+plot(NA,NA, main = "rETR", 
+     xlab = "Epar (μmols photons m-2 s-1)", 
+     ylab = "rETR (μmols electrons m-2 s-1)", 
+     xlim = c(0,1000), 
+     ylim = c(0,400))
+
+## Run this
+```{r}
+for (i in 1:n){
+  #Get ith data
+  Epar <- alpha_ek_alga$Epar[alpha_ek_alga$uid==uniqueIds[i]]
+  rETR <- alpha_ek_alga$rETR[alpha_ek_alga$uid==uniqueIds[i]]
+ 
+  #Call function
+  myfit <- fitWebb(Epar,rETR)
+  #Store the 4-values outputs into the matrix 
+  alpha[i,] <- myfit$alpha
+  ek[i,] <- myfit$ek 
+
+# plot the data points
+#if (individual_plots)
+#  plot(Epar,rETR, main = uniqueIds[i], xlab = "Epar (μmols photons m-2 s-1)", 
+#       ylab = "rETR (μmols electrons m-2 s-1)", xlim = c(0,1000), ylim = c(0,500))
+
+E <- seq(0,1000,by=1)
+with(myfit, {
+  P <- alpha[1] * ek[1] * (1 - exp (-E / ek[1]))
+#  lines(E, P)
+})
+}
+```
+## Create a vector for ETRmax and calculate from rETRmax for Dr. Smith to visualize
+```{r}
+ETRmax = round(rETRMaxes*0.5*0.84, digits = 2)
+```
+
+
+
+## extracting the date and the specimen ID from the uniqueIds
+```{r}
+dates = substr(uniqueIds, 1, 10)
+```
+
+
+## Read in data frame with date and RLC day for integration with the ek alpha output
+```{r}
+rlc_day_assign <- read.csv("/Users/Angela/src/work/limu/phytotools_alpha_ek/data_input/date_day_assignment.csv", sep = ",")
+```
+
+## Create an array that combines the date with the RLC day (1, 5, or 9)
+```{r}
+rlc_days_by_date = array(dim = length(dates))
+hash_of_rlc_days_by_date <- hash(rlc_day_assign$Date, rlc_day_assign$RLC.Day)
+for (i in 1:length(dates)) {
+  rlc_days_by_date[i] = hash_of_rlc_days_by_date[[dates[i]]]
+}
+```
+
+## Now subset the data to include the Quantum Yield values (first row) and deltaNPQ (last row)
+```{r}
+first_row_of_rlc <- subset(alpha_ek_alga, Epar == 0 & NPQ == "-")
+last_row_rlc <- subset(alpha_ek_alga, Epar == 820)
+```
+
+## Build the resulting data frame to be used for final analysis
+```{r}
+result_df <- data.frame(Date = substr(uniqueIds, 1, 10), 
+                        "Specimen ID" = substr(uniqueIds, 12, 17),
+                        uid = uniqueIds, 
+                        "Plant ID" = first_row_of_rlc$plant.ID,
+                        "Species" = first_row_of_rlc$species,
+                        "Lanai Side" = first_row_of_rlc$lanai.side,
+                        "Treatment" = first_row_of_rlc$treatment,
+                        "Temp (°C)" = first_row_of_rlc$Temp,
+                        "RLC Order" = first_row_of_rlc$RLC.order,
+                        "RLC Day" = rlc_days_by_date,
+                        "Run" = first_row_of_rlc$run,
+                        "deltaNPQ" = last_row_rlc$deltaNPQ,
+                        "rETRmax" = rETRMaxes,
+                        "ETRmax" = ETRmax,
+                        "alpha" = round(alpha, digits = 3),
+                        "ek" = round(ek, digits = 1)
+                        )
+
+
+```
+
+# Save to file 
+#write.csv(result_df, "data_output/run5-6_ek_alpha.csv")
+

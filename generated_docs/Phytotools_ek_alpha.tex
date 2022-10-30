@@ -1,0 +1,439 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\title{Using Cleaned Photosynthesis Dataset to Produce Final with Ek and
+alpha}
+\author{Angela Richards Donà}
+\date{5/19/2022}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Using Cleaned Photosynthesis Dataset to Produce Final with Ek and alpha},
+  pdfauthor={Angela Richards Donà},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+Produce final dataset using cleaned PAM data and Phytotools package This
+script takes the cleaned data from PAM output and runs the Phytotools
+package to produce a final dataset that can be used for analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"phytotools"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: insol
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: FME
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: deSolve
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: rootSolve
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: coda
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"hash"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## hash-2.2.6.2 provided by Decision Patterns
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"dplyr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\hypertarget{read-in-the-data}{%
+\subsection{Read in the data}\label{read-in-the-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"/Users/Angela/src/work/limu/algal\_growth\_photosynthesis/data\_output/run5{-}6\_clean.csv"}\NormalTok{, }\AttributeTok{sep =} \StringTok{","}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-column-that-turns-date-format-into-posixct}{%
+\subsection{Add a column that turns date format into
+POSIXct}\label{add-a-column-that-turns-date-format-into-posixct}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{posix\_date }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{Date, }\AttributeTok{format =} \StringTok{"\%m/\%d/\%y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-new-column-with-date-and-specimen-id-as-unique-key}{%
+\subsection{Add a new column with date and specimen ID as unique
+key}\label{add-a-new-column-with-date-and-specimen-id-as-unique-key}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{uid }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{posix\_date, alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{ID, }\AttributeTok{sep =} \StringTok{"\_"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-new-column-with-a-number-to-indicate-just-the-species}{%
+\subsection{Add a new column with a number to indicate just the
+species}\label{add-a-new-column-with-a-number-to-indicate-just-the-species}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{species }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{tolower}\NormalTok{(}\FunctionTok{substr}\NormalTok{(alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{ID2, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-a-new-column-for-treatment-assigned-from-the-5th-character-in-id2}{%
+\subsection{Add a new column for treatment assigned from the 5th
+character in
+ID2}\label{add-a-new-column-for-treatment-assigned-from-the-5th-character-in-id2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{treatment }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{substr}\NormalTok{(alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{ID2, }\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{create-a-new-column-based-on-yii-at-epar-0-effective-quantum-yield}{%
+\subsection{Create a new column based on Y(II) at Epar 0 (Effective
+quantum
+yield)}\label{create-a-new-column-based-on-yii-at-epar-0-effective-quantum-yield}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha\_ek\_alga }\OtherTok{\textless{}{-}} \FunctionTok{transform}\NormalTok{(alpha\_ek\_alga, }\AttributeTok{QuanYield =} \FunctionTok{ifelse}\NormalTok{(Epar }\SpecialCharTok{==} \StringTok{"0"}\NormalTok{, Y.II., }\ConstantTok{NA}\NormalTok{))  }
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{use-unique-function-to-eliminate-duplicates-and-return-all-unique-dateids-into-a-vector}{%
+\subsection{Use unique function to eliminate duplicates and return all
+unique Date/IDs into a
+vector}\label{use-unique-function-to-eliminate-duplicates-and-return-all-unique-dateids-into-a-vector}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{uniqueIds }\OtherTok{\textless{}{-}} \FunctionTok{unique}\NormalTok{(alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{uid)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{store-the-number-of-unique-ids-in-the-variable-n}{%
+\subsection{Store the number of unique IDs in the variable
+n}\label{store-the-number-of-unique-ids-in-the-variable-n}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(uniqueIds)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{create-a-matrix-full-of-nas-with-n-rows-and-1-column-to-later-calculate-etrmax}{%
+\subsection{Create a matrix full of NAs with n rows and 1 column to
+later calculate
+ETRmax}\label{create-a-matrix-full-of-nas-with-n-rows-and-1-column-to-later-calculate-etrmax}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rETRMaxes }\OtherTok{=} \FunctionTok{array}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\FunctionTok{c}\NormalTok{(n,}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{create-the-retrmax-column}{%
+\subsection{Create the rETRmax column}\label{create-the-retrmax-column}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n)\{}
+\NormalTok{  sub }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(alpha\_ek\_alga, uid }\SpecialCharTok{==}\NormalTok{ uniqueIds[i])}
+\NormalTok{  subMaxETR }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(sub}\SpecialCharTok{$}\NormalTok{rETR)}
+  \CommentTok{\#store the subMaxETR in the new column but only in rows where uid is same as uniqueIds of i}
+\NormalTok{  alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{rETRmax[alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{uid }\SpecialCharTok{==}\NormalTok{ uniqueIds[i]] }\OtherTok{\textless{}{-}}\NormalTok{ subMaxETR}
+  \CommentTok{\#also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax}
+\NormalTok{  rETRMaxes[i] }\OtherTok{=}\NormalTok{ subMaxETR}
+\NormalTok{  \}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{prepare-empty-matrices-to-hold-output-from-fitwebb}{%
+\subsection{Prepare empty matrices to hold output from
+fitWebb}\label{prepare-empty-matrices-to-hold-output-from-fitwebb}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\FunctionTok{c}\NormalTok{(n,}\DecValTok{4}\NormalTok{))}
+\NormalTok{ek }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\ConstantTok{NA}\NormalTok{,}\FunctionTok{c}\NormalTok{(n,}\DecValTok{4}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{use-this-to-switch-from-one-plot-with-all-the-curves-overlaid-together-to-one}{%
+\subsection{Use this to switch from one plot with all the curves
+overlaid together to
+one}\label{use-this-to-switch-from-one-plot-with-all-the-curves-overlaid-together-to-one}}
+
+\#\#individual plot for each specimen
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{individual\_plots }\OtherTok{=} \ConstantTok{FALSE}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plots-are-too-many-to-run-for-markdown-and-will-be-commented-out-but-the-code-is-here}{%
+\subsection{Plots are too many to run for markdown and will be commented
+out but the code is
+here}\label{plots-are-too-many-to-run-for-markdown-and-will-be-commented-out-but-the-code-is-here}}
+
+if (!individual\_plots)plot plot(NA,NA, main = ``rETR'', xlab = ``Epar
+(μmols photons m-2 s-1)'', ylab = ``rETR (μmols electrons m-2 s-1)'',
+xlim = c(0,1000), ylim = c(0,400))
+
+\hypertarget{run-this}{%
+\subsection{Run this}\label{run-this}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n)\{}
+  \CommentTok{\#Get ith data}
+\NormalTok{  Epar }\OtherTok{\textless{}{-}}\NormalTok{ alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{Epar[alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{uid}\SpecialCharTok{==}\NormalTok{uniqueIds[i]]}
+\NormalTok{  rETR }\OtherTok{\textless{}{-}}\NormalTok{ alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{rETR[alpha\_ek\_alga}\SpecialCharTok{$}\NormalTok{uid}\SpecialCharTok{==}\NormalTok{uniqueIds[i]]}
+ 
+  \CommentTok{\#Call function}
+\NormalTok{  myfit }\OtherTok{\textless{}{-}} \FunctionTok{fitWebb}\NormalTok{(Epar,rETR)}
+  \CommentTok{\#Store the 4{-}values outputs into the matrix }
+\NormalTok{  alpha[i,] }\OtherTok{\textless{}{-}}\NormalTok{ myfit}\SpecialCharTok{$}\NormalTok{alpha}
+\NormalTok{  ek[i,] }\OtherTok{\textless{}{-}}\NormalTok{ myfit}\SpecialCharTok{$}\NormalTok{ek }
+
+\CommentTok{\# plot the data points}
+\CommentTok{\#if (individual\_plots)}
+\CommentTok{\#  plot(Epar,rETR, main = uniqueIds[i], xlab = "Epar (μmols photons m{-}2 s{-}1)", }
+\CommentTok{\#       ylab = "rETR (μmols electrons m{-}2 s{-}1)", xlim = c(0,1000), ylim = c(0,500))}
+
+\NormalTok{E }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1000}\NormalTok{,}\AttributeTok{by=}\DecValTok{1}\NormalTok{)}
+\FunctionTok{with}\NormalTok{(myfit, \{}
+\NormalTok{  P }\OtherTok{\textless{}{-}}\NormalTok{ alpha[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ ek[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{exp}\NormalTok{ (}\SpecialCharTok{{-}}\NormalTok{E }\SpecialCharTok{/}\NormalTok{ ek[}\DecValTok{1}\NormalTok{]))}
+\CommentTok{\#  lines(E, P)}
+\NormalTok{\})}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{create-a-vector-for-etrmax-and-calculate-from-retrmax-for-dr.-smith-to-visualize}{%
+\subsection{Create a vector for ETRmax and calculate from rETRmax for
+Dr.~Smith to
+visualize}\label{create-a-vector-for-etrmax-and-calculate-from-retrmax-for-dr.-smith-to-visualize}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ETRmax }\OtherTok{=} \FunctionTok{round}\NormalTok{(rETRMaxes}\SpecialCharTok{*}\FloatTok{0.5}\SpecialCharTok{*}\FloatTok{0.84}\NormalTok{, }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{extracting-the-date-and-the-specimen-id-from-the-uniqueids}{%
+\subsection{extracting the date and the specimen ID from the
+uniqueIds}\label{extracting-the-date-and-the-specimen-id-from-the-uniqueids}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dates }\OtherTok{=} \FunctionTok{substr}\NormalTok{(uniqueIds, }\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{read-in-data-frame-with-date-and-rlc-day-for-integration-with-the-ek-alpha-output}{%
+\subsection{Read in data frame with date and RLC day for integration
+with the ek alpha
+output}\label{read-in-data-frame-with-date-and-rlc-day-for-integration-with-the-ek-alpha-output}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rlc\_day\_assign }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"/Users/Angela/src/work/limu/phytotools\_alpha\_ek/data\_input/date\_day\_assignment.csv"}\NormalTok{, }\AttributeTok{sep =} \StringTok{","}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{create-an-array-that-combines-the-date-with-the-rlc-day-1-5-or-9}{%
+\subsection{Create an array that combines the date with the RLC day (1,
+5, or
+9)}\label{create-an-array-that-combines-the-date-with-the-rlc-day-1-5-or-9}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rlc\_days\_by\_date }\OtherTok{=} \FunctionTok{array}\NormalTok{(}\AttributeTok{dim =} \FunctionTok{length}\NormalTok{(dates))}
+\NormalTok{hash\_of\_rlc\_days\_by\_date }\OtherTok{\textless{}{-}} \FunctionTok{hash}\NormalTok{(rlc\_day\_assign}\SpecialCharTok{$}\NormalTok{Date, rlc\_day\_assign}\SpecialCharTok{$}\NormalTok{RLC.Day)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(dates)) \{}
+\NormalTok{  rlc\_days\_by\_date[i] }\OtherTok{=}\NormalTok{ hash\_of\_rlc\_days\_by\_date[[dates[i]]]}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{now-subset-the-data-to-include-the-quantum-yield-values-first-row-and-deltanpq-last-row}{%
+\subsection{Now subset the data to include the Quantum Yield values
+(first row) and deltaNPQ (last
+row)}\label{now-subset-the-data-to-include-the-quantum-yield-values-first-row-and-deltanpq-last-row}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{first\_row\_of\_rlc }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(alpha\_ek\_alga, Epar }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ NPQ }\SpecialCharTok{==} \StringTok{"{-}"}\NormalTok{)}
+\NormalTok{last\_row\_rlc }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(alpha\_ek\_alga, Epar }\SpecialCharTok{==} \DecValTok{820}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{build-the-resulting-data-frame-to-be-used-for-final-analysis}{%
+\subsection{Build the resulting data frame to be used for final
+analysis}\label{build-the-resulting-data-frame-to-be-used-for-final-analysis}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{result\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Date =} \FunctionTok{substr}\NormalTok{(uniqueIds, }\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{), }
+                        \StringTok{"Specimen ID"} \OtherTok{=} \FunctionTok{substr}\NormalTok{(uniqueIds, }\DecValTok{12}\NormalTok{, }\DecValTok{17}\NormalTok{),}
+                        \AttributeTok{uid =}\NormalTok{ uniqueIds, }
+                        \StringTok{"Plant ID"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{plant.ID,}
+                        \StringTok{"Species"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{species,}
+                        \StringTok{"Lanai Side"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{lanai.side,}
+                        \StringTok{"Treatment"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{treatment,}
+                        \StringTok{"Temp (°C)"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{Temp,}
+                        \StringTok{"RLC Order"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{RLC.order,}
+                        \StringTok{"RLC Day"} \OtherTok{=}\NormalTok{ rlc\_days\_by\_date,}
+                        \StringTok{"Run"} \OtherTok{=}\NormalTok{ first\_row\_of\_rlc}\SpecialCharTok{$}\NormalTok{run,}
+                        \StringTok{"deltaNPQ"} \OtherTok{=}\NormalTok{ last\_row\_rlc}\SpecialCharTok{$}\NormalTok{deltaNPQ,}
+                        \StringTok{"rETRmax"} \OtherTok{=}\NormalTok{ rETRMaxes,}
+                        \StringTok{"ETRmax"} \OtherTok{=}\NormalTok{ ETRmax,}
+                        \StringTok{"alpha"} \OtherTok{=} \FunctionTok{round}\NormalTok{(alpha, }\AttributeTok{digits =} \DecValTok{3}\NormalTok{),}
+                        \StringTok{"ek"} \OtherTok{=} \FunctionTok{round}\NormalTok{(ek, }\AttributeTok{digits =} \DecValTok{1}\NormalTok{)}
+\NormalTok{                        )}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{save-to-file}{%
+\section{Save to file}\label{save-to-file}}
+
+\#write.csv(result\_df, ``data\_output/run5-6\_ek\_alpha.csv'')
+
+\end{document}
