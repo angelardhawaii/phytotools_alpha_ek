@@ -58,13 +58,14 @@ ek <- array(NA,c(n,4))
 treatment_names = c("35ppt/0.5uM", "35ppt/14uM", "28ppt/27uM", "28ppt/53uM", "18ppt/53uM", "11ppt/80uM")
 treatment = array(NA,c(n,1))
 
+
 for (i in 1:n){
         #Get ith data
         Epar <- selectedData$Epar[selectedData$uid==uniqueIds[i]]
         rETR <- selectedData$rETR[selectedData$uid==uniqueIds[i]]
         y.II <- selectedData$Y.II.[selectedData$uid==uniqueIds[i]]
         
-        #Call function (adding normalize = TRUE will yield more accurate PE parameters)
+        #Call function (using y.II and adding normalize = TRUE will yield more accurate PE parameters)
         myfit <- fitWebb(Epar, y.II, normalize = TRUE)
         #store the four values outputs in the matrix
         alpha[i,] <- myfit$alpha
