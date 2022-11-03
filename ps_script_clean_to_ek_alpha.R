@@ -126,3 +126,4 @@ result_df <- data.frame(Date = substr(uniqueIds, 1, 10),
 
 # save to file
 write.csv(result_df, "data_output/hyp_ulva_all_runs_ek_alpha_normalized.csv")
+write.csv (result_df, "../irradiance_ek/data_ek/hyp_ulva_all_runs_ek_alpha_normalized.csv")
