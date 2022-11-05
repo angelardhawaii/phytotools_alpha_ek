@@ -11,6 +11,7 @@ alpha_ek_alga <- read.csv("data_input/hyp_ulva_all_runs_clean.csv", sep = ",")
 # add a column that turns date format into POSIXct
 alpha_ek_alga$posix_date <- as.POSIXct(alpha_ek_alga$Date, format = "%m/%d/%y")
 
+
 # add a new column with date and specimen ID as unique key
 alpha_ek_alga$uid <- paste(alpha_ek_alga$posix_date, alpha_ek_alga$ID, sep = "_")
 
@@ -37,6 +38,7 @@ n <- length(uniqueIds)
 
 # create a matrix full of NAs with n rows and 1 column to later calculate ETRmax 
 rETRMaxes = array(NA,c(n,1))
+rlc_end_times = array(NA, c(n,1))
 #temperatures = array(dim = n)
 
 # create the rETRmax column
@@ -48,6 +50,7 @@ for (i in 1:n){
         #also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax
         rETRMaxes[i] = subMaxETR
         #temperatures[i] = max(sub$Temp)
+        rlc_end_times[i] <- max(sub$Time)
 }
 
 # prepare empty matrices to hold output from fitWebb
@@ -103,6 +106,7 @@ last_row_rlc <- subset(alpha_ek_alga, Epar == 820)
 
 # build the result data frame
 result_df <- data.frame(Date = substr(uniqueIds, 1, 10), 
+                        "rlc_end_time" = rlc_end_times,
                         "Specimen ID" = substr(uniqueIds, 12, 18),
                         uid = uniqueIds, 
                         "Plant ID" = first_row_of_rlc$plant.ID,
