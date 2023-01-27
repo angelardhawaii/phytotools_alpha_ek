@@ -29,7 +29,7 @@ alpha_ek_alga <- transform(alpha_ek_alga, QuanYield = ifelse(Epar == "0", Y.II.,
 
 # remove all rows where rETR is null or negative
 selectedData <- subset(alpha_ek_alga, rETR > 0) 
-selectedData <- alpha_ek_alga
+
 # unique function eliminates duplicates returns all unique IDs into a vector
 uniqueIds <- unique(selectedData$uid)
 
@@ -131,3 +131,5 @@ result_df <- data.frame(Date = substr(uniqueIds, 1, 10),
 # save to file
 write.csv(result_df, "data_output/hyp_ulva_all_runs_ek_alpha_normalized.csv")
 write.csv (result_df, "../irradiance_ek/data_ek/hyp_ulva_all_runs_ek_alpha_normalized.csv")
+write.csv(result_df, "../algal_growth_photosynthesis/data_input/hyp_ulva_all_runs_ek_alpha_normalized.csv")
+
