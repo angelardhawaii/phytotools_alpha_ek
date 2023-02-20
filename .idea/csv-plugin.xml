@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data_input/date_day_assignment.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data_input/hyp_ulva_all_runs_clean.csv">
           <value>
             <Attribute>

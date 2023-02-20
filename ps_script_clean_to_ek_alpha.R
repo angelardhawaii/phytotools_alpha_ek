@@ -39,18 +39,21 @@ n <- length(uniqueIds)
 # create a matrix full of NAs with n rows and 1 column to later calculate ETRmax 
 rETRMaxes = array(NA,c(n,1))
 rlc_end_times = array(NA, c(n,1))
+rETRmaxYpoint1 = array(NA, c(n,1))
 #temperatures = array(dim = n)
 
 # create the rETRmax column
+#also create a rETRmaxYpoint1 column per Beer & Axelsson where we take the max value but only if Y>0.1
 for (i in 1:n){
-        sub <- subset(selectedData, uid == uniqueIds[i])
-        subMaxETR <- max(sub$rETR)
+        light_curve <- subset(selectedData, uid == uniqueIds[i])
+        subMaxETR <- max(light_curve$rETR)
+        rETRmaxYpoint1[i] <- max(subset(light_curve, y.II > .1)$rETR, na.rm = TRUE)
         #store the subMaxETR in the new column but only in rows where uid is same as uniqueIds of i
         selectedData$rETRmax[selectedData$uid == uniqueIds[i]] <- subMaxETR
         #also store subMaxETR in the matrix rETRMaxes created previously, to later calculate ETRmax
         rETRMaxes[i] = subMaxETR
         #temperatures[i] = max(sub$Temp)
-        rlc_end_times[i] <- max(sub$Time)
+        rlc_end_times[i] <- max(light_curve$Time)
 }
 
 # prepare empty matrices to hold output from fitWebb
@@ -79,9 +82,9 @@ for (i in 1:n){
 dates = substr(uniqueIds, 1, 10)
 specimens = substr(uniqueIds, 12, 18)
 
-#create a vector for ETRmax calculated from rETRmax for Dr Smith to visualize
-ETRmax = round(rETRMaxes*0.5*0.84, digits = 2)
-
+pmax <- array(NA, c(n,1))
+pmax = round(alpha[,1] * ek[,1], digits = 2)
+        
 #add a new column to selectedData for ETRmax
 selectedData$ETRmax <- round(selectedData$rETRmax*0.5*0.84, digits = 2)
 
@@ -101,8 +104,6 @@ for (i in 1:length(dates)) {
 
 first_row_of_rlc <- subset(alpha_ek_alga, Epar == 0 & NPQ == "-")
 last_row_rlc <- subset(alpha_ek_alga, Epar == 820)
- 
-
 
 # build the result data frame
 result_df <- data.frame(Date = substr(uniqueIds, 1, 10), 
@@ -118,15 +119,13 @@ result_df <- data.frame(Date = substr(uniqueIds, 1, 10),
                         "RLC Day" = rlc_days_by_date,
                         "Run" = first_row_of_rlc$run,
                         "deltaNPQ" = last_row_rlc$deltaNPQ,
+                        "pmax" = pmax,
                         "rETRmax" = rETRMaxes,
-                        "ETRmax" = ETRmax,
+                        "rETRmaxYpoint1" = rETRmaxYpoint1,
                         "alpha" = round(alpha, digits = 3),
                         "ek" = round(ek, digits = 1)
                         )
 
-
-
-#"alpha_est", "alpha_stderr", "alpha_t", "alpha_p", "ek_est", "ek_stderr", "ek_t", "ek_p", 
 
 # save to file
 write.csv(result_df, "data_output/hyp_ulva_all_runs_ek_alpha_normalized.csv")
